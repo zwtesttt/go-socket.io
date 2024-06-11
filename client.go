@@ -65,10 +65,6 @@ func (c *Client) Connect() error {
 		Transports: []transport.Transport{polling.Default},
 	}
 
-	if c.opts.Transports != nil {
-		dialer.Transports = c.opts.Transports
-	}
-
 	enginioCon, err := dialer.Dial(c.url, nil)
 	if err != nil {
 		return err

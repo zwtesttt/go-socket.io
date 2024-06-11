@@ -2,9 +2,11 @@ package socketio
 
 import (
 	"errors"
+	"fmt"
 	"github.com/zwtesttt/go-socket.io/engineio"
 	"github.com/zwtesttt/go-socket.io/engineio/transport"
 	"github.com/zwtesttt/go-socket.io/engineio/transport/polling"
+	"github.com/zwtesttt/go-socket.io/engineio/transport/websocket"
 	"github.com/zwtesttt/go-socket.io/logger"
 	"github.com/zwtesttt/go-socket.io/parser"
 	"net/url"
@@ -25,6 +27,33 @@ type Client struct {
 
 // NewClient returns a server
 // addr like http://asd.com:8080/{$namespace}
+//
+//	func NewClient(addr string, opts *engineio.Options) (*Client, error) {
+//		if addr == "" {
+//			return nil, EmptyAddrErr
+//		}
+//
+//		u, err := url.Parse(addr)
+//		if err != nil {
+//			return nil, err
+//		}
+//
+//		namespace := fmtNS(u.Path)
+//
+//		// Not allowing other than default
+//		u.Path = path.Join("/socket.io", namespace)
+//		u.Path = u.EscapedPath()
+//		if strings.HasSuffix(u.Path, "socket.io") {
+//			u.Path += "/"
+//		}
+//
+//		return &Client{
+//			namespace: namespace,
+//			url:       u.String(),
+//			handlers:  newNamespaceHandlers(),
+//			opts:      opts,
+//		}, nil
+//	}
 func NewClient(addr string, opts *engineio.Options) (*Client, error) {
 	if addr == "" {
 		return nil, EmptyAddrErr
@@ -35,17 +64,15 @@ func NewClient(addr string, opts *engineio.Options) (*Client, error) {
 		return nil, err
 	}
 
-	namespace := fmtNS(u.Path)
+	//namespace := fmtNS(u.Path)
+	//fmt.Println("namespace:", namespace)
 
-	// Not allowing other than default
-	//u.Path = path.Join("/socket.io", namespace)
-	//u.Path = u.EscapedPath()
-	//if strings.HasSuffix(u.Path, "socket.io") {
-	//	u.Path += "/"
-	//}
+	// 使用传入的完整 URL 地址
+	u.Path = u.EscapedPath()
+	fmt.Println("u.Path:", u.Path)
 
 	return &Client{
-		namespace: namespace,
+		namespace: "",
 		url:       u.String(),
 		handlers:  newNamespaceHandlers(),
 		opts:      opts,
@@ -62,7 +89,11 @@ func fmtNS(ns string) string {
 
 func (c *Client) Connect() error {
 	dialer := engineio.Dialer{
-		Transports: []transport.Transport{polling.Default},
+		Transports: []transport.Transport{polling.Default, websocket.Default},
+	}
+	// Use opts Transports when NewClient
+	if c.opts != nil && len(c.opts.Transports) > 0 {
+		dialer.Transports = c.opts.Transports
 	}
 
 	enginioCon, err := dialer.Dial(c.url, nil)

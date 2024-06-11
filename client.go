@@ -2,11 +2,11 @@ package socketio
 
 import (
 	"errors"
-	"github.com/googollee/go-socket.io/engineio"
-	"github.com/googollee/go-socket.io/engineio/transport"
-	"github.com/googollee/go-socket.io/engineio/transport/polling"
-	"github.com/googollee/go-socket.io/logger"
-	"github.com/googollee/go-socket.io/parser"
+	"github.com/zwtesttt/go-socket.io/engineio"
+	"github.com/zwtesttt/go-socket.io/engineio/transport"
+	"github.com/zwtesttt/go-socket.io/engineio/transport/polling"
+	"github.com/zwtesttt/go-socket.io/logger"
+	"github.com/zwtesttt/go-socket.io/parser"
 	"net/url"
 )
 
